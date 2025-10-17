@@ -3,7 +3,10 @@ mod sse;
 mod stdio;
 mod streamablehttp;
 
+use std::ffi::OsStr;
 use std::io;
+use std::process::Stdio;
+use std::sync::Arc;
 
 use rmcp::model::{ClientNotification, ClientRequest, JsonRpcRequest};
 use rmcp::transport::TokioChildProcess;
@@ -78,6 +81,8 @@ pub enum UpstreamError {
 	Send,
 	#[error("upstream closed on receive")]
 	Recv,
+	#[error("stdio initialize failed: {details}")]
+	InitializeFailed { details: String },
 }
 
 // UpstreamTarget defines a source for MCP information.
@@ -266,15 +271,28 @@ impl UpstreamGroup {
 				let cmd = which::which(cmd)?;
 				#[cfg(target_family = "unix")]
 				let mut c = Command::new(cmd);
+				#[cfg(target_family = "unix")]
+				let program_os = OsStr::new(cmd);
 				#[cfg(target_os = "windows")]
 				let mut c = Command::new(&cmd);
+				#[cfg(target_os = "windows")]
+				let program_os = cmd.as_os_str();
 				c.args(args);
 				for (k, v) in env {
 					c.env(k, v);
 				}
-				let proc =
-					TokioChildProcess::new(c).context(format!("failed to run command '{:?}'", &cmd))?;
-				upstream::Upstream::McpStdio(upstream::stdio::Process::new(proc))
+				let command_label_string = format_command_label(program_os, args);
+				let spawn_label = command_label_string.clone();
+				let (proc, stderr) = TokioChildProcess::builder(c)
+					.stderr(Stdio::piped())
+					.spawn()
+					.context(format!("failed to run command '{}'", spawn_label))?;
+				let logs = Arc::new(stdio::ProcessLogs::new(stdio::STDIO_LOG_CAPACITY));
+				if let Some(stderr) = stderr {
+					logs.spawn_stderr_reader(stderr);
+				}
+				let command_label: Arc<str> = Arc::from(command_label_string.into_boxed_str());
+				upstream::Upstream::McpStdio(stdio::Process::new_with_logging(proc, logs, command_label))
 			},
 			McpTargetSpec::OpenAPI(open) => {
 				// Renamed for clarity
@@ -308,4 +326,13 @@ impl UpstreamGroup {
 
 		Ok(target)
 	}
+}
+
+fn format_command_label(program: &OsStr, args: &[String]) -> String {
+	let mut label = program.to_string_lossy().into_owned();
+	if !args.is_empty() {
+		label.push(' ');
+		label.push_str(&args.join(" "));
+	}
+	label
 }
