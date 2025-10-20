@@ -13,6 +13,9 @@ categories = ["network-programming", "web-programming::http-client", "web-progra
 edition = "2021"
 rust-version = "1.85"
 
+[lib]
+doctest = false
+
 [package.metadata.docs.rs]
 features = ["full"]
 rustdoc-args = ["--cfg", "docsrs"]

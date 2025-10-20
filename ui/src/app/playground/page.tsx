@@ -42,12 +42,10 @@ import {
   Send,
   Loader2,
   Clock,
-  Shield,
   Settings,
   CheckCircle,
   AlertCircle,
   Info,
-  Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { v4 as uuidv4 } from "uuid";
@@ -55,6 +53,8 @@ import { v4 as uuidv4 } from "uuid";
 import { CapabilitiesList } from "@/components/playground/CapabilitiesList";
 import { ActionPanel } from "@/components/playground/ActionPanel";
 import { ResponseDisplay } from "@/components/playground/ResponseDisplay";
+import { PoliciesCard } from "@/components/policies/PoliciesCard";
+import { extractPolicies } from "@/lib/mapPolicies";
 
 // Schema for MCP tool invocation response
 const McpToolResponseSchema = z.any();
@@ -181,6 +181,8 @@ export default function PlaygroundPage() {
     isRequestRunning: false,
     isLoadingCapabilities: false,
   });
+
+  const selectedRoutePolicies = extractPolicies(selectedRoute?.route as any);
 
   // Extract routes from configuration
   useEffect(() => {
@@ -1213,74 +1215,9 @@ export default function PlaygroundPage() {
                         )}
                       </div>
                     </div>
-                    {selectedRoute.route.policies &&
-                      Object.keys(selectedRoute.route.policies).length > 0 && (
-                        <div>
-                          <span className="text-muted-foreground">Policies:</span>
-                          <div className="mt-1 flex flex-wrap gap-1">
-                            {Object.entries(selectedRoute.route.policies).map(
-                              ([policyType, policyConfig]) => {
-                                // Skip null/undefined policies
-                                if (!policyConfig) return null;
-
-                                // Get policy display info
-                                const getPolicyInfo = (type: string) => {
-                                  switch (type) {
-                                    case "jwtAuth":
-                                      return { name: "JWT Auth", icon: Shield };
-                                    case "mcpAuthentication":
-                                      return { name: "MCP Auth", icon: Shield };
-                                    case "mcpAuthorization":
-                                      return { name: "MCP Authz", icon: Shield };
-                                    case "cors":
-                                      return { name: "CORS", icon: Globe };
-                                    case "backendTLS":
-                                      return { name: "Backend TLS", icon: Shield };
-                                    case "backendAuth":
-                                      return { name: "Backend Auth", icon: Shield };
-                                    case "localRateLimit":
-                                      return { name: "Local Rate Limit", icon: Clock };
-                                    case "remoteRateLimit":
-                                      return { name: "Remote Rate Limit", icon: Clock };
-                                    case "timeout":
-                                      return { name: "Timeout", icon: Clock };
-                                    case "retry":
-                                      return { name: "Retry", icon: ArrowRight };
-                                    case "requestHeaderModifier":
-                                      return { name: "Request Headers", icon: Settings };
-                                    case "responseHeaderModifier":
-                                      return { name: "Response Headers", icon: Settings };
-                                    case "requestRedirect":
-                                      return { name: "Redirect", icon: ArrowRight };
-                                    case "urlRewrite":
-                                      return { name: "URL Rewrite", icon: Settings };
-                                    case "directResponse":
-                                      return { name: "Direct Response", icon: Server };
-                                    case "extAuthz":
-                                      return { name: "External Auth", icon: Shield };
-                                    case "ai":
-                                      return { name: "AI Policy", icon: Settings };
-                                    case "a2a":
-                                      return { name: "A2A", icon: Users };
-                                    default:
-                                      return { name: type, icon: Settings };
-                                  }
-                                };
-
-                                const info = getPolicyInfo(policyType);
-                                const Icon = info.icon;
-
-                                return (
-                                  <Badge key={policyType} variant="outline" className="text-xs">
-                                    <Icon className="h-3 w-3 mr-1" />
-                                    {info.name}
-                                  </Badge>
-                                );
-                              }
-                            )}
-                          </div>
-                        </div>
-                      )}
+                    <div className="mt-4">
+                      <PoliciesCard policies={selectedRoutePolicies} />
+                    </div>
                   </div>
                 </div>
 
