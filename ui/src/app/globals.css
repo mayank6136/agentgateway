@@ -11,6 +11,8 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 220 25% 10%;
+    --font-sans: ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+      "Apple Color Emoji", "Segoe UI Emoji";
     --card: 0 0% 100%;
     --card-foreground: 220 25% 10%;
     --popover: 0 0% 100%;
@@ -156,6 +158,7 @@
     @apply border-border outline-ring/50;
   }
   body {
+    font-family: var(--font-sans);
     @apply bg-background text-foreground;
   }
 }

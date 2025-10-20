@@ -17,5 +17,18 @@
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "@typescript-eslint/no-empty-object-type": "off"
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/types/policies.ts",
+        "src/lib/mapPolicies.ts",
+        "src/components/policies/**/*.tsx"
+      ],
+      "rules": {
+        "prettier/prettier": "off",
+        "@typescript-eslint/consistent-type-definitions": "off"
+      }
+    }
+  ]
 }

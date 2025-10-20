@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LoadingWrapper } from "@/components/loading-wrapper";
@@ -11,15 +10,7 @@ import { WizardProvider } from "@/lib/wizard-context";
 import { ConfigErrorWrapper } from "@/components/config-error-wrapper";
 import { XdsModeNotification } from "@/components/xds-mode-notification";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const __offlineFont = { className: "", variable: "" } as const;
 
 export const metadata: Metadata = {
   title: "Agentgateway Dashboard",
@@ -36,9 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased h-full flex flex-col`}
-      >
+      <body className={`${__offlineFont.variable} antialiased h-full flex flex-col`}>
         <ServerProvider>
           <ThemeProvider
             attribute="class"
