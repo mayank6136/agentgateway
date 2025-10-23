@@ -1,0 +1,32 @@
+name: mcp-policy-tests
+on:
+  pull_request:
+    paths:
+      - 'crates/agentgateway/**'
+      - '.github/workflows/**'
+  push:
+    branches:
+      - feat/mcp-policy-tests-extauth-rl-554
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      RUST_BACKTRACE: 1
+      RUST_LOG: info
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+      - name: Set up Node (for npx MCP server)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Pre-fetch MCP server package
+        run: npx --yes @modelcontextprotocol/server-everything --help >/dev/null 2>&1 || true
+      - name: Build gateway crate
+        run: cargo build -p agentgateway
+      - name: Run MCP policy tests (single thread to avoid port races)
+        run: cargo test -p agentgateway --test mcp_policies_extauth_ratelimit -- --nocapture --test-threads=1
