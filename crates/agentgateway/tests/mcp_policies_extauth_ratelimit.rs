@@ -358,14 +358,12 @@ async fn spawn_rls_on(addr: SocketAddr, limit: u32) -> tokio::task::JoinHandle<(
 
 #[tokio::test(flavor = "multi_thread")]
 async fn mcp_extauth_denies_unauthorized() {
-	if which("npx").is_err() && which("npx.cmd").is_err() {
+	if which("npx").is_err() {
 		eprintln!("skipping MCP integration test: `npx` not found");
 		return;
 	}
 
-	let npx_path = which("npx")
-		.or_else(|_| which("npx.cmd"))
-		.expect("`npx` should resolve after availability check");
+	let npx_path = which("npx").expect("`npx` should resolve after availability check");
 
 	let gw_port = free_port();
 	let authz_port = free_port();
@@ -401,14 +399,12 @@ async fn mcp_extauth_denies_unauthorized() {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn mcp_extauth_allows_authorized() {
-	if which("npx").is_err() && which("npx.cmd").is_err() {
+	if which("npx").is_err() {
 		eprintln!("skipping MCP integration test: `npx` not found");
 		return;
 	}
 
-	let npx_path = which("npx")
-		.or_else(|_| which("npx.cmd"))
-		.expect("`npx` should resolve after availability check");
+	let npx_path = which("npx").expect("`npx` should resolve after availability check");
 
 	let gw_port = free_port();
 	let authz_port = free_port();
@@ -434,14 +430,12 @@ async fn mcp_extauth_allows_authorized() {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn local_ratelimit_blocks_after_threshold() {
-	if which("npx").is_err() && which("npx.cmd").is_err() {
+	if which("npx").is_err() {
 		eprintln!("skipping MCP integration test: `npx` not found");
 		return;
 	}
 
-	let npx_path = which("npx")
-		.or_else(|_| which("npx.cmd"))
-		.expect("`npx` should resolve after availability check");
+	let npx_path = which("npx").expect("`npx` should resolve after availability check");
 
 	let gw_port = free_port();
 	let (mut mcp_child, mcp_name, mcp_port) = spawn_mcp_everything(npx_path.as_path()).await;
@@ -491,14 +485,12 @@ async fn local_ratelimit_blocks_after_threshold() {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn remote_ratelimit_blocks_after_threshold() {
-	if which("npx").is_err() && which("npx.cmd").is_err() {
+	if which("npx").is_err() {
 		eprintln!("skipping MCP integration test: `npx` not found");
 		return;
 	}
 
-	let npx_path = which("npx")
-		.or_else(|_| which("npx.cmd"))
-		.expect("`npx` should resolve after availability check");
+	let npx_path = which("npx").expect("`npx` should resolve after availability check");
 
 	let gw_port = free_port();
 	let rls_port = free_port();
@@ -570,14 +562,12 @@ async fn remote_ratelimit_blocks_after_threshold() {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn remote_ratelimit_isolated_by_descriptor_key() {
-	if which("npx").is_err() && which("npx.cmd").is_err() {
+	if which("npx").is_err() {
 		eprintln!("skipping MCP integration test: `npx` not found");
 		return;
 	}
 
-	let npx_path = which("npx")
-		.or_else(|_| which("npx.cmd"))
-		.expect("`npx` should resolve after availability check");
+	let npx_path = which("npx").expect("`npx` should resolve after availability check");
 
 	let gw_port = free_port();
 	let rls_port = free_port();
@@ -664,14 +654,12 @@ async fn remote_ratelimit_isolated_by_descriptor_key() {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn remote_ratelimit_concurrent_requests_enforce_limit() {
-	if which("npx").is_err() && which("npx.cmd").is_err() {
+	if which("npx").is_err() {
 		eprintln!("skipping MCP integration test: `npx` not found");
 		return;
 	}
 
-	let npx_path = which("npx")
-		.or_else(|_| which("npx.cmd"))
-		.expect("`npx` should resolve after availability check");
+	let npx_path = which("npx").expect("`npx` should resolve after availability check");
 
 	let gw_port = free_port();
 	let rls_port = free_port();
@@ -739,7 +727,7 @@ async fn remote_ratelimit_concurrent_requests_enforce_limit() {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn extauth_outage_semantics_opt_in() {
-	if which("npx").is_err() && which("npx.cmd").is_err() {
+	if which("npx").is_err() {
 		eprintln!("skipping MCP integration test: `npx` not found");
 		return;
 	}
@@ -749,9 +737,7 @@ async fn extauth_outage_semantics_opt_in() {
 		return;
 	}
 
-	let npx_path = which("npx")
-		.or_else(|_| which("npx.cmd"))
-		.expect("`npx` should resolve after availability check");
+	let npx_path = which("npx").expect("`npx` should resolve after availability check");
 
 	let gw_port = free_port();
 	let dead_port = free_port(); // no server on this port
@@ -790,7 +776,7 @@ async fn extauth_outage_semantics_opt_in() {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn rls_outage_semantics_opt_in() {
-	if which("npx").is_err() && which("npx.cmd").is_err() {
+	if which("npx").is_err() {
 		eprintln!("skipping MCP integration test: `npx` not found");
 		return;
 	}
@@ -800,9 +786,7 @@ async fn rls_outage_semantics_opt_in() {
 		return;
 	}
 
-	let npx_path = which("npx")
-		.or_else(|_| which("npx.cmd"))
-		.expect("`npx` should resolve after availability check");
+	let npx_path = which("npx").expect("`npx` should resolve after availability check");
 
 	let gw_port = free_port();
 	let dead_port = free_port();

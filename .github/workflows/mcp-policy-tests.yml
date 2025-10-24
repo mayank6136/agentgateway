@@ -1,33 +1,52 @@
-name: mcp-policy-tests
+name: MCP Policy Tests
+
 on:
   pull_request:
     paths:
-      - 'crates/agentgateway/**'
-      - '.github/workflows/**'
-  push:
-    branches:
-      - feat/mcp-policy-tests-extauth-rl-554
+      - "crates/agentgateway/**"
+      - ".github/workflows/mcp-policy-tests.yml"
+  workflow_dispatch:
+
 jobs:
-  test:
+  mcp-policy-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    env:
-      RUST_BACKTRACE: 1
-      RUST_LOG: info
+    timeout-minutes: 20
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Rust (stable)
-        uses: dtolnay/rust-toolchain@stable
-      - name: Cache cargo
-        uses: Swatinem/rust-cache@v2
-      - name: Set up Node (for npx MCP server)
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-      - name: Pre-fetch MCP server package
-        run: npx --yes @modelcontextprotocol/server-everything --help >/dev/null 2>&1 || true
-      - name: Build gateway crate
-        run: cargo build -p agentgateway
+          node-version: "20"
+
+      - name: Verify npx
+        run: npx --version
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      # Optional warmup if your test pulls an MCP server via npx:
+      - name: Warm MCP package tarball (best-effort)
+        run: |
+          set -euxo pipefail
+          npx -y --yes @modelcontextprotocol/server-memory --help || true
+
+      - name: Build
+        run: cargo build --workspace --all-features
+
       - name: Run MCP policy tests (single thread to avoid port races)
         run: |
           cargo test -p agentgateway \
