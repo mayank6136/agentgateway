@@ -29,4 +29,8 @@ jobs:
       - name: Build gateway crate
         run: cargo build -p agentgateway
       - name: Run MCP policy tests (single thread to avoid port races)
-        run: cargo test -p agentgateway --test mcp_policies_extauth_ratelimit -- --nocapture --test-threads=1
+        run: |
+          cargo test -p agentgateway \
+            --features mcp_integration \
+            --test mcp_policies_extauth_ratelimit \
+            -- --nocapture --test-threads=1
