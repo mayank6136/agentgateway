@@ -15,7 +15,8 @@ ui = []
 schema = ["schemars"]
 tls-ring = ["rustls/ring", "tokio-rustls/ring"]
 internal_benches = ["divan"]
-testing = []
+testing = ["dep:wiremock"]
+mcp_integration = []
 
 [dependencies]
 a2a-sdk.workspace = true
@@ -58,6 +59,7 @@ hex.workspace = true
 hickory-resolver.workspace = true
 http-body-util.workspace = true
 http-body.workspace = true
+wiremock = { workspace = true, optional = true }
 http-serde.workspace = true
 http.workspace = true
 httpdate.workspace = true
@@ -148,16 +150,28 @@ protox.workspace = true
 prost-wkt-build.workspace = true
 
 [dev-dependencies]
-assert_matches.workspace = true
-divan.workspace = true
-insta.workspace = true
-tempfile.workspace = true
-tokio = { workspace = true, features = ["test-util"] }
-wiremock.workspace = true
-which.workspace = true
 agentgateway = { version = "0.7.0", path = ".", default-features = false, features = [
     "testing",
+    "internal_benches",
 ] }
+assert_cmd = "2.0"
+assert_matches.workspace = true
+divan.workspace = true
+envoy-prost-tonic = "0.1"
+futures = "0.3"
+futures-util = "0.3"
+insta.workspace = true
+predicates = "3.1"
+prost = "0.12"
+reqwest = { version = "0.12", features = ["json", "stream", "rustls-tls"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_yaml = "0.9"
+tempfile = "3.10"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "process", "time", "signal", "test-util"] }
+tonic = { version = "0.11", features = ["transport"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
+which = "6"
 rmcp = { workspace = true, features = [
     "transport-streamable-http-client-reqwest",
     "transport-sse-client-reqwest",
